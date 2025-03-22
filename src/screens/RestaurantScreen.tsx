@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { View, Animated } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../store";
@@ -59,13 +59,14 @@ export const RestaurantScreen: React.FC<RestaurantScreenProps> = (): JSX.Element
   ];
 
   // Filter restaurants based on selected categories
-  const filteredRestaurants = selectedCategories.length > 0
-    ? restaurants.filter((restaurant) =>
-        restaurant.restaurant_specialities?.some((speciality) =>
-          selectedCategories.includes(speciality.category)
-        )
-      )
-    : restaurants;
+  const filteredRestaurants = useMemo(() => {
+    return restaurants.filter(restaurant => {
+      if (selectedCategories.length === 0) return true;
+      return restaurant.restaurant_specialities.some(
+        spec => selectedCategories.includes(spec.id)
+      );
+    });
+  }, [restaurants, selectedCategories]);
 
   // Toggle category selection
   const toggleCategory = (category: string) => {
