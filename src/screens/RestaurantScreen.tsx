@@ -510,7 +510,7 @@ export const RestaurantScreen: React.FC<RestaurantScreenProps> = (): JSX.Element
             renderItem={renderRestaurant}
             keyExtractor={(item) => item.id}
             onEndReached={loadMore}
-            onEndReachedThreshold={0.5} // Trigger loadMore when 50% from the end
+            onEndReachedThreshold={0.3} // Trigger loadMore when 50% from the end
             ListFooterComponent={renderFooter}
             ListEmptyComponent={renderEmpty}
             refreshing={refreshing}
