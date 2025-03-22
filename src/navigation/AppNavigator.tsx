@@ -4,6 +4,10 @@ import { RootStackParamList } from "../types/navigation";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
+/**
+ * Define the AppNavigator function component to set up the navigation
+ * @returns Stack.Navigator
+ */
 export function AppNavigator() {
   return (
     <Stack.Navigator>

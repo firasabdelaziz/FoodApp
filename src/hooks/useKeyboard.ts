@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import { Keyboard } from "react-native";
 
+/**
+ * Hook that listens to the keyboard events and returns the keyboard visibility state and a function to dismiss the keyboard.
+ */
 export const useKeyboard = () => {
   const [keyboardVisible, setKeyboardVisible] = useState(false);
 

@@ -2,7 +2,11 @@ import { ToastConfig, ToastConfigParams } from "react-native-toast-message";
 import { View, StyleSheet } from "react-native";
 import { Text, IconButton } from "react-native-paper";
 import normalize from "../hooks/useNormalize";
+import { theme } from "../styles/theme";
 
+/**
+ * Define a custom toast configuration  
+ */
 const toastConfig: ToastConfig = {
   error: ({ text1, props, hide }: ToastConfigParams<any>) => (
     <View style={styles.errorToast}>
@@ -19,7 +23,7 @@ const toastConfig: ToastConfig = {
 
 const styles = StyleSheet.create({
   errorToast: {
-    backgroundColor: "white",
+    backgroundColor: theme.colors.white,
     padding: normalize(8),
     borderRadius: normalize(8),
     flexDirection: "row",
@@ -27,7 +31,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     marginHorizontal: normalize(16),
     elevation: 3,
-    shadowColor: "#000",
+    shadowColor: theme.colors.black,
     shadowOffset: {
       width: 0,
       height: normalize(2),
@@ -45,8 +49,8 @@ const styles = StyleSheet.create({
   },
   messageText: {
     fontSize: normalize(16),
-    color: "#000000",
-    fontFamily: "Ubuntu-Medium",
+    color: theme.colors.black,
+    fontFamily: theme.fontFamily.medium,
   },
 });
 

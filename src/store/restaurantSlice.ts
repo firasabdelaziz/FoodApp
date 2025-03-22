@@ -20,6 +20,10 @@ const initialState: RestaurantState = {
   hasMore: false,
 };
 
+/**
+ * Fetch a list of restaurants from the API
+ * @param {number} page - The page number to fetch
+ */
 export const fetchRestaurants = createAsyncThunk(
   "restaurant/fetchRestaurants",
   async (page: number, { rejectWithValue }) => {
@@ -61,7 +65,7 @@ const restaurantSlice = createSlice({
         state.restaurants = state.page === 1
           ? action.payload.data
           : [...state.restaurants, ...action.payload.data];
-        state.page = state.page + 1; // Increment page after successful fetch
+        state.page = state.page + 1;
         state.totalPages = action.payload.totalPages;
         state.hasMore = action.payload.hasMore;
       })

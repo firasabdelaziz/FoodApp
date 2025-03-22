@@ -1,7 +1,6 @@
 import React from "react";
 import { View, Image, StyleSheet } from "react-native";
 import normalize from "../../hooks/useNormalize";
-import { theme } from "../../styles/theme";
 
 interface UserAvatarProps {
   source: any;
@@ -24,7 +23,7 @@ export const UserAvatar: React.FC<UserAvatarProps> = ({ source, size }) => {
           }
         ]} 
       />
-      <View style={[styles.statusDot, { top: 3, left: -2 }]} /> {/* Moved more to the left */}
+      <View style={[styles.statusDot, { top: 3, left: -2 }]} /> 
     </View>
   );
 };
@@ -34,7 +33,7 @@ const styles = StyleSheet.create({
     position: "relative",
   },
   avatar: {
-    // Border now defined inline above
+    // avatar styles
   },
   statusDot: {
     position: "absolute",
