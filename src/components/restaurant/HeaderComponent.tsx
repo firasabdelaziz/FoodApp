@@ -42,7 +42,7 @@ export const HeaderComponent: React.FC<HeaderComponentProps> = ({
                 color={theme.colors.black}
               />
             </View>
-            <Text style={styles.headerSubtitle}>Borj louzir, Ariana</Text>
+            <Text style={styles.headerSubtitle}>Mourouj</Text>
           </View>
           <View style={styles.toggleContainer}>
             <TouchableOpacity
