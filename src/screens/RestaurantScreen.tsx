@@ -9,6 +9,7 @@ import {
   Image as RNImage,
   Dimensions,
   ActivityIndicator,
+  Animated,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useDispatch, useSelector } from "react-redux";
@@ -30,19 +31,19 @@ export const RestaurantScreen: React.FC<RestaurantScreenProps> = (): JSX.Element
   const { restaurants, loading, error, page, hasMore } = useSelector(
     (state: RootState) => state.restaurant
   );
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]); // Changed to array for multiple selections
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [isDelivery, setIsDelivery] = useState<boolean>(true);
   const [refreshing, setRefreshing] = useState(false);
+  const scrollY = new Animated.Value(0); // Track scroll position
 
+  // Fetch page 1 only on initial mount
   useEffect(() => {
-    if (restaurants.length === 0 && !loading) {
-      console.log("Initial fetch for page 1");
-      dispatch(fetchRestaurants(1));
-    }
-  }, [dispatch, restaurants.length, loading]);
+    console.log("Component mounted, fetching page 1");
+    dispatch(fetchRestaurants(1));
+  }, [dispatch]); // No dependencies other than dispatch to run only once on mount
 
   const loadMore = useCallback(() => {
-    if (!loading && hasMore) {
+    if (!loading && hasMore && page > 1) { // Only load more if page > 1 and not already loading
       console.log("Loading more, current page:", page);
       dispatch(fetchRestaurants(page));
     }
@@ -63,7 +64,6 @@ export const RestaurantScreen: React.FC<RestaurantScreenProps> = (): JSX.Element
     { name: "Beverages", icon: require("../../assets/category/beverage.webp"), isIcon: false },
   ];
 
-  // Filter restaurants based on multiple selected categories
   const filteredRestaurants = selectedCategories.length > 0
     ? restaurants.filter((restaurant) =>
         restaurant.restaurant_specialities?.some((speciality) =>
@@ -75,8 +75,8 @@ export const RestaurantScreen: React.FC<RestaurantScreenProps> = (): JSX.Element
   const toggleCategory = (category: string) => {
     setSelectedCategories((prev) =>
       prev.includes(category)
-        ? prev.filter((c) => c !== category) // Remove if already selected
-        : [...prev, category] // Add if not selected
+        ? prev.filter((c) => c !== category)
+        : [...prev, category]
     );
   };
 
@@ -328,182 +328,202 @@ export const RestaurantScreen: React.FC<RestaurantScreenProps> = (): JSX.Element
   }, [loading, filteredRestaurants.length]);
 
   return (
-    <View style={[CommonStyles.container, { paddingBottom: 0 }]}>
-      <LinearGradient
-        colors={["#C4E2DD", "#E8F7F1", theme.colors.white]}
-        style={{ width: "100%" }}
+    <View style={{ flex: 1 }}>
+      <Animated.ScrollView
+        style={{ flex: 1 }}
+        contentContainerStyle={{ paddingBottom: normalize(20) }}
+        onScroll={Animated.event(
+          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+          { useNativeDriver: false }
+        )}
+        scrollEventThrottle={16}
+        stickyHeaderIndices={[1]} // Sticky search bar section
       >
-        <SafeAreaView>
-          <StatusBar barStyle="dark-content" backgroundColor="#E5F5F2" />
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              paddingHorizontal: normalize(20),
-              paddingVertical: normalize(12),
-              backgroundColor: "transparent",
-            }}
-          >
-            <UserAvatar source={require("../../assets/userItem.jpg")} size={55} />
-            <View style={{ flex: 1, marginLeft: normalize(12) }}>
-              <View style={{ flexDirection: "row", alignItems: "center" }}>
-                <Text
-                  style={{
-                    fontSize: normalize(28),
-                    fontFamily: theme.fontFamily.medium,
-                    color: theme.colors.black,
-                    marginRight: normalize(5),
-                  }}
-                >
-                  Work
-                </Text>
-                <Ionicons
-                  name="chevron-down"
-                  size={normalize(20)}
-                  color={theme.colors.black}
-                  style={{ marginLeft: normalize(2) }}
-                />
-              </View>
-              <Text
-                style={{
-                  fontSize: normalize(14),
-                  color: theme.colors.darkGray,
-                  marginTop: normalize(2),
-                  fontFamily: theme.fontFamily.regular,
-                }}
-              >
-                Borj louzir,Ariana,
-              </Text>
-            </View>
+        {/* Scrolling header part */}
+        <LinearGradient colors={["#C4E2DD", "#E8F7F1"]} style={{ width: "100%" }}>
+          <SafeAreaView>
+            <StatusBar barStyle="dark-content" backgroundColor="#E5F5F2" />
             <View
               style={{
                 flexDirection: "row",
-                width: normalize(70),
-                height: normalize(36),
-                backgroundColor: theme.colors.black,
-                borderRadius: normalize(18),
-                overflow: "hidden",
                 alignItems: "center",
-                justifyContent: "space-between",
-                padding: normalize(3),
+                paddingHorizontal: normalize(20),
+                paddingVertical: normalize(12),
+                backgroundColor: "transparent",
               }}
             >
-              <TouchableOpacity
+              <UserAvatar source={require("../../assets/userItem.jpg")} size={55} />
+              <View style={{ flex: 1, marginLeft: normalize(12) }}>
+                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                  <Text
+                    style={{
+                      fontSize: normalize(28),
+                      fontFamily: theme.fontFamily.medium,
+                      color: theme.colors.black,
+                      marginRight: normalize(5),
+                    }}
+                  >
+                    Work
+                  </Text>
+                  <Ionicons
+                    name="chevron-down"
+                    size={normalize(20)}
+                    color={theme.colors.black}
+                    style={{ marginLeft: normalize(2) }}
+                  />
+                </View>
+                <Text
+                  style={{
+                    fontSize: normalize(14),
+                    color: theme.colors.darkGray,
+                    marginTop: normalize(2),
+                    fontFamily: theme.fontFamily.regular,
+                  }}
+                >
+                  Borj louzir,Ariana,
+                </Text>
+              </View>
+              <View
                 style={{
-                  width: normalize(32),
-                  height: normalize(30),
-                  justifyContent: "center",
+                  flexDirection: "row",
+                  width: normalize(70),
+                  height: normalize(36),
+                  backgroundColor: theme.colors.black,
+                  borderRadius: normalize(18),
+                  overflow: "hidden",
                   alignItems: "center",
-                  borderRadius: normalize(15),
-                  backgroundColor: isDelivery ? theme.colors.white : "transparent",
+                  justifyContent: "space-between",
+                  padding: normalize(3),
                 }}
-                onPress={() => setIsDelivery(true)}
               >
-                <Ionicons
-                  name="bicycle"
-                  size={normalize(18)}
-                  color={isDelivery ? theme.colors.black : theme.colors.white}
-                />
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={{
-                  width: normalize(32),
-                  height: normalize(30),
-                  justifyContent: "center",
-                  alignItems: "center",
-                  borderRadius: normalize(15),
-                  backgroundColor: !isDelivery ? theme.colors.white : "transparent",
-                }}
-                onPress={() => setIsDelivery(false)}
-              >
-                <Ionicons
-                  name="bag"
-                  size={normalize(18)}
-                  color={!isDelivery ? theme.colors.black : theme.colors.white}
-                />
-              </TouchableOpacity>
+                <TouchableOpacity
+                  style={{
+                    width: normalize(32),
+                    height: normalize(30),
+                    justifyContent: "center",
+                    alignItems: "center",
+                    borderRadius: normalize(15),
+                    backgroundColor: isDelivery ? theme.colors.white : "transparent",
+                  }}
+                  onPress={() => setIsDelivery(true)}
+                >
+                  <Ionicons
+                    name="bicycle"
+                    size={normalize(18)}
+                    color={isDelivery ? theme.colors.black : theme.colors.white}
+                  />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={{
+                    width: normalize(32),
+                    height: normalize(30),
+                    justifyContent: "center",
+                    alignItems: "center",
+                    borderRadius: normalize(15),
+                    backgroundColor: !isDelivery ? theme.colors.white : "transparent",
+                  }}
+                  onPress={() => setIsDelivery(false)}
+                >
+                  <Ionicons
+                    name="bag"
+                    size={normalize(18)}
+                    color={!isDelivery ? theme.colors.black : theme.colors.white}
+                  />
+                </TouchableOpacity>
+              </View>
             </View>
-          </View>
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              backgroundColor: theme.colors.white,
-              borderRadius: normalize(30),
-              marginHorizontal: normalize(16),
-              marginVertical: normalize(10),
-              paddingHorizontal: normalize(20),
-              paddingVertical: normalize(12),
-              shadowColor: "#000",
-              shadowOffset: { width: 0, height: 6 },
-              shadowOpacity: 0.2,
-              shadowRadius: 10,
-              elevation: 10,
-            }}
-          >
-            <Ionicons
-              name="search"
-              size={normalize(20)}
-              color={theme.colors.midGray}
-              style={{ marginRight: normalize(12) }}
-            />
-            <TextInput
-              style={{ flex: 1, fontSize: normalize(16), color: theme.colors.black }}
-              placeholder="Search your favourite food"
-              placeholderTextColor={theme.colors.midGray}
-            />
-            <Ionicons
-              name="options"
-              size={normalize(20)}
-              color={theme.colors.midGray}
-              style={{ marginLeft: normalize(12) }}
-            />
-          </View>
+          </SafeAreaView>
+        </LinearGradient>
+
+        {/* Sticky search bar part within gradient */}
+        <SafeAreaView style={{ flex: 0 }}>
+          <LinearGradient colors={["#E8F7F1", theme.colors.white]} style={{ width: "100%" }}>
+            <View style={{ height: normalize(20) }} /> {/* Spacer before search */}
+            <View
+              style={{
+                paddingHorizontal: normalize(16),
+                paddingBottom: normalize(10),
+              }}
+            >
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  backgroundColor: theme.colors.white,
+                  borderRadius: normalize(30),
+                  paddingHorizontal: normalize(20),
+                  paddingVertical: normalize(12),
+                  shadowColor: "#000",
+                  shadowOffset: { width: 0, height: 6 },
+                  shadowOpacity: 0.2,
+                  shadowRadius: 10,
+                  elevation: 10,
+                }}
+              >
+                <Ionicons
+                  name="search"
+                  size={normalize(20)}
+                  color={theme.colors.midGray}
+                  style={{ marginRight: normalize(12) }}
+                />
+                <TextInput
+                  style={{ flex: 1, fontSize: normalize(16), color: theme.colors.black }}
+                  placeholder="Search your favourite food"
+                  placeholderTextColor={theme.colors.midGray}
+                />
+                <Ionicons
+                  name="options"
+                  size={normalize(20)}
+                  color={theme.colors.midGray}
+                  style={{ marginLeft: normalize(12) }}
+                />
+              </View>
+            </View>
+          </LinearGradient>
         </SafeAreaView>
-      </LinearGradient>
 
-      {renderSelectedCategoryLabels()}
+        {renderSelectedCategoryLabels()}
 
-      <FlashList
-        data={categories}
-        renderItem={renderCategory}
-        keyExtractor={(item) => item.name}
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={{
-          paddingHorizontal: normalize(16),
-          paddingVertical: normalize(10),
-        }}
-        estimatedItemSize={normalize(85)}
-      />
-
-      {error ? (
-        <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-          <Text style={{ fontSize: normalize(16), color: "#24AF7E" }}>{error}</Text>
-          <TouchableOpacity onPress={onRefresh} style={{ marginTop: normalize(10) }}>
-            <Text style={{ color: "#24AF7E" }}>Retry</Text>
-          </TouchableOpacity>
-        </View>
-      ) : (
         <FlashList
-          data={filteredRestaurants}
-          renderItem={renderRestaurant}
-          keyExtractor={(item) => item.id}
-          onEndReached={loadMore}
-          onEndReachedThreshold={0.3}
-          ListFooterComponent={renderFooter}
-          ListEmptyComponent={renderEmpty}
-          refreshing={refreshing}
-          onRefresh={onRefresh}
+          data={categories}
+          renderItem={renderCategory}
+          keyExtractor={(item) => item.name}
+          horizontal
+          showsHorizontalScrollIndicator={false}
           contentContainerStyle={{
             paddingHorizontal: normalize(16),
-            paddingTop: normalize(10),
-            paddingBottom: normalize(20),
+            paddingVertical: normalize(10),
           }}
-          estimatedItemSize={normalize(280)}
-          showsVerticalScrollIndicator={false}
+          estimatedItemSize={normalize(85)}
         />
-      )}
+
+        {error ? (
+          <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+            <Text style={{ fontSize: normalize(16), color: "#24AF7E" }}>{error}</Text>
+            <TouchableOpacity onPress={onRefresh} style={{ marginTop: normalize(10) }}>
+              <Text style={{ color: "#24AF7E" }}>Retry</Text>
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <FlashList
+            data={filteredRestaurants}
+            renderItem={renderRestaurant}
+            keyExtractor={(item) => item.id}
+            onEndReached={loadMore}
+            onEndReachedThreshold={0.5} // Trigger loadMore when 50% from the end
+            ListFooterComponent={renderFooter}
+            ListEmptyComponent={renderEmpty}
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            contentContainerStyle={{
+              paddingHorizontal: normalize(16),
+              paddingTop: normalize(10),
+            }}
+            estimatedItemSize={normalize(280)}
+            showsVerticalScrollIndicator={false}
+          />
+        )}
+      </Animated.ScrollView>
     </View>
   );
 };
