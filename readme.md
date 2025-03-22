@@ -3,6 +3,10 @@
 ## Overview
 Food is a React Native mobile application designed for food delivery and pickup services. The app allows users to browse restaurants, filter by categories, toggle between delivery and pickup modes, and view restaurant details such as ratings, distance, and preparation time.
 
+
+https://github.com/user-attachments/assets/3990ff60-dbef-468d-9391-bdfcf22ae178
+
+
 ## Features
 - **Restaurant Listing**: Browse restaurants with details like name, rating, distance, and preparation time
 - **Category Filtering**: Filter restaurants by food categories with an intuitive UI
