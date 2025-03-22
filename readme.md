@@ -1,7 +1,7 @@
-# Sparrow Food App
+# Food App
 
 ## Overview
-Sparrow Food is a React Native mobile application designed for food delivery and pickup services. The app allows users to browse restaurants, filter by categories, toggle between delivery and pickup modes, and view restaurant details such as ratings, distance, and preparation time.
+Food is a React Native mobile application designed for food delivery and pickup services. The app allows users to browse restaurants, filter by categories, toggle between delivery and pickup modes, and view restaurant details such as ratings, distance, and preparation time.
 
 ## Features
 - **Restaurant Listing**: Browse restaurants with details like name, rating, distance, and preparation time
